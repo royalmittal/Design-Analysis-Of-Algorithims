@@ -305,7 +305,7 @@ public class BinaryTree {
             java.util.HashMap<Integer, Node> map = new java.util.HashMap<>();
             int min, max = 0;
             q.add(new info(root, 0));
-            q.add = null;
+            q.add(null);
             while (!q.isEmpty()) {
                 info curr = q.remove();
                 if (curr == null) {
@@ -316,18 +316,15 @@ public class BinaryTree {
                     }
                 } else {
                     if (!map.containsKey(curr.hd)) {
-                        map.put(curr.hd, curr.node);
+                        map.put(curr.hd, curr.root);
                     }
-                    if (curr.node.left != null) {
-                        q.add(new info(curr.node.left, curr.hd - 1));
+                    if (curr.root.left != null) {
+                        q.add(new info(curr.root.left, curr.hd - 1));
                         min = Math.min(min, curr.hd - 1);
                     }
-                    if (curr.node.right != null) {
-                        q.add(new info(curr.node.right, curr.hd + 1));
+                    if (curr.root.right != null) {
+                        q.add(new info(curr.root.right, curr.hd + 1));
                         max = Math.max(max, curr.hd + 1);
-                    }
-                    for (int i = min; i <= max; i++) {
-                        System.out.print(map.get(i).data + " ");
                     }
                 }
             }
@@ -338,7 +335,7 @@ public class BinaryTree {
             java.util.HashMap<Integer, Node> map = new java.util.HashMap<>();
             int min, max = 0;
             q.add(new info(root, 0));
-            q.add = null;
+            q.add(null);
             while (!q.isEmpty()) {
                 info curr = q.remove();
                 if (curr == null) {
@@ -348,13 +345,13 @@ public class BinaryTree {
                         q.add(null);
                     }
                 } else {
-                    map.put(curr.hd, curr.node);
-                    if (curr.node.left != null) {
-                        q.add(new info(curr.node.left, curr.hd - 1));
+                    map.put(curr.hd, curr.root);
+                    if (curr.root.left != null) {
+                        q.add(new info(curr.root.left, curr.hd - 1));
                         min = Math.min(min, curr.hd - 1);
                     }
-                    if (curr.node.right != null) {
-                        q.add(new info(curr.node.right, curr.hd + 1));
+                    if (curr.root.right != null) {
+                        q.add(new info(curr.root.right, curr.hd + 1));
                         max = Math.max(max, curr.hd + 1);
                     }
                 }
@@ -375,6 +372,130 @@ public class BinaryTree {
             kthLevel(root.right, k - 1);
         }
 
+    }
+
+    public static boolean getpath(Node root, int n, ArrayList<Node> path) {
+        if (root == null) {
+            return false;
+        }
+        path.add(root);
+        if (root.data == n) {
+            return true;
+        }
+        boolean foundRight = getpath(root.right, n, path);
+        boolean foundLeft = getpath(root.left, n, path);
+        if (foundLeft || foundRight) {
+            return true;
+        }
+        path.remove(path.size() - 1);
+        return false;
+    }
+
+    public static Node leastCommonAncestor(Node root, int n1, int n2) {
+        ArrayList<Node> path1 = new ArrayList<>();
+        ArrayList<Node> path2 = new ArrayList<>();
+        getpath(root, n1, path1);
+        getpath(root, n2, path2);
+        int i = 0;
+        for (i = 0; i < path1.size() && i < path2.size(); i++) {
+            if (path1.get(i) != path2.get(i)) {
+                break;
+            }
+        }
+        Node lca = path1.get(i - 1);
+        return lca;
+    }
+
+    public static Node lowestComonAncestor(Node root, int n1, int n2) {
+        if (root == null || root.data == n1 || root.data == n2) {
+            return root;
+        }
+        Node leftLCA = lowestComonAncestor(root.left, n1, n2);
+        Node rightLCA = lowestComonAncestor(root.right, n1, n2);
+        if (rightLCA == null) {
+            return leftLCA;
+        }
+        if (leftLCA == null) {
+            return rightLCA;
+        }
+        return root;
+    }
+
+    public static int lcaDistance(Node root, int n) {
+        if (root == null) {
+            return -1;
+        }
+        if (root.data == n) {
+            return 0;
+        }
+        int leftDist = lcaDistance(root.left, n);
+        int rightDist = lcaDistance(root.right, n);
+        if (leftDist == -1 && rightDist == -1) {
+            return -1;
+        } else if (leftDist == -1) {
+            return rightDist + 1;
+        } else {
+            return leftDist + 1;
+        }
+    }
+
+    public static int minDist(Node root, int n1, int n2) {
+        Node lca = lowestComonAncestor(root, n1, n2);
+        int dist1 = lcaDistance(lca, n1);
+        int dist2 = lcaDistance(lca, n2);
+        return dist1 + dist2;
+    }
+
+    public static int kAncestor(Node root, int n, int k) {
+        if (root == null) {
+            return -1;
+        }
+        if (root.data == n) {
+            return 0;
+        }
+        int leftDist = kAncestor(root.left, n, k);
+        int rightDist = kAncestor(root.right, n, k);
+        if (leftDist == -1 && rightDist == -1) {
+            return -1;
+        }
+        int max = Math.max(leftDist, rightDist);
+        if (max + 1 == k) {
+            System.out.println(root.data);
+        }
+        return max + 1;
+    }
+
+    public static int sumTreeTransform(Node root) {
+        if (root == null) {
+            return 0;
+        }
+        int leftChild = sumTreeTransform(root.left);
+        int rightChild = sumTreeTransform(root.right);
+        int data = root.data;
+        root.data = leftChild + rightChild;
+        return data + root.data;
+    }
+
+    public static void preorder(Node root) {
+        if (root == null) {
+            return;
+        }
+        System.out.println(root.data + " ");
+        preorder(root.left);
+        preorder(root.right);
+    }
+
+    public static void display(Node root) {
+        if (root == null) {
+            return;
+        }
+        String str = "";
+        str += root.left == null ? "." : root.left.data;
+        str += " <- " + root.data + " -> ";
+        str += root.right == null ? "." : root.right.data;
+        System.out.println(str);
+        display(root.left);
+        display(root.right);
     }
 
     public static void main(String[] args) {
@@ -407,92 +528,95 @@ public class BinaryTree {
         System.out.println("18 for printing kth level");
         System.out.println("19 for printing all the paths from root to leaf");
         System.out.println("20 for printing all the paths from root to leaf with target sum");
-        int choice = sc.nextInt();
-        Node root = Node.buildTree(nodes);
-        switch (choice) {
-            case 1: {
-                System.out.println(Node.size(root));
-                break;
-            }
-            case 2: {
-                Node.preOrder(root);
-                break;
-            }
-            case 3: {
-                Node.inOrder(root);
-                break;
-            }
-            case 4: {
-                Node.postOrder(root);
-                break;
-            }
-            case 5: {
-                Node.levelOrder(root);
-                break;
-            }
-            case 6: {
-                System.out.println(Node.height(root));
-                break;
-            }
-            case 7: {
-                System.out.println(Node.count(root));
-                break;
-            }
-            case 8: {
-                System.out.println(Node.sum(root));
-                break;
-            }
-            case 9: {
-                System.out.println(Node.max(root));
-                break;
-            }
-            case 10: {
-                System.out.println(Node.min(root));
-                break;
-            }
-            case 11: {
-                int data = sc.nextInt();
-                System.out.println(Node.find(root, data));
-                break;
-            }
-            case 12: {
-                System.out.println(Node.diameterOfTree(root));
-                break;
-            }
-            case 13: {
-                Node.mirror(root);
-                Node.levelOrder(root);
-                break;
-            }
-            case 14: {
-                System.out.println(Node.isBalanced(root));
-                break;
-            }
-            case 15: {
-                Node.printSingleChildNodes(root);
-                break;
-            }
-            case 16: {
-                Node.topView(root);
-                break;
-            }
-            case 17: {
-                Node.bottomView(root);
-                break;
-            }
-            case 18: {
-                int k = sc.nextInt();
-                Node.kthLevel(root, k);
-                break;
-            }
-            case 19: {
-                Node.printAllPaths(root, "");
-                break;
-            }
-            case 20: {
-                int target = sc.nextInt();
-                Node.printAllPathsTargetSum(root, "", target);
-                break;
+        System.out.println("21 Display Tree");
+        System.out.println("0 for exit");
+        Node root = Binarytree.buildTree(nodes);
+        while (true) {
+            System.out.println("Enter your choice:");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println("Size of the tree is: " + Binarytree.size(root));
+                    break;
+                case 2:
+                    System.out.println("PreOrder traversal of the tree is: ");
+                    Binarytree.preOrder(root);
+                    break;
+                case 3:
+                    System.out.println("InOrder traversal of the tree is: ");
+                    Binarytree.inOrder(root);
+                    break;
+                case 4:
+                    System.out.println("PostOrder traversal of the tree is: ");
+                    Binarytree.postOrder(root);
+                    break;
+                case 5:
+                    System.out.println("LevelOrder traversal of the tree is: ");
+                    Binarytree.levelOrder(root);
+                    break;
+                case 6:
+                    System.out.println("Height of the tree is: " + Binarytree.height(root));
+                    break;
+                case 7:
+                    System.out.println("Count of the nodes is: " + Binarytree.count(root));
+                    break;
+                case 8:
+                    System.out.println("Sum of the nodes is: " + Binarytree.sum(root));
+                    break;
+                case 9:
+                    System.out.println("Max of the nodes is: " + Binarytree.max(root));
+                    break;
+                case 10:
+                    System.out.println("Min of the nodes is: " + Binarytree.min(root));
+                    break;
+                case 11:
+                    System.out.println("Enter the node to be searched: ");
+                    int data = sc.nextInt();
+                    System.out.println("Node found: " + Binarytree.find(root, data));
+                    break;
+                case 12:
+                    System.out.println("Diameter of the tree is: " + Binarytree.diameterOfTree(root));
+                    break;
+                case 13:
+                    System.out.println("Mirror of the tree is: ");
+                    Binarytree.display(root);
+                    break;
+                case 14:
+                    System.out.println("Tree is balanced: " + Binarytree.isBalanced(root));
+                    break;
+                case 15:
+                    System.out.println("Single child nodes are: ");
+                    Binarytree.printSingleChild(root);
+                    break;
+                case 16:
+                    System.out.println("Top view of the tree is: ");
+                    Binarytree.topView(root);
+                    break;
+                case 17:
+                    System.out.println("Bottom view of the tree is: ");
+                    Binarytree.bottomView(root);
+                    break;
+                case 18:
+                    System.out.println("Enter the level: ");
+                    int k = sc.nextInt();
+                    System.out.println("Nodes at level " + k + " are: ");
+                    Binarytree.kthLevel(root, k);
+                    break;
+                case 19:
+                    System.out.println("All the paths from root to leaf are: ");
+                    break;
+                case 20:
+                    System.out.println("Enter the target sum: ");
+                    int target = sc.nextInt();
+                    System.out.println("All the paths from root to leaf with target sum are: ");
+                    break;
+                case 21:
+                    System.out.println("Tree is: ");
+                    Binarytree.display(root);
+                    break;
+                case 0:
+                    System.exit(0);
+                    break;
             }
         }
     }
